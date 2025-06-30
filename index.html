@@ -455,9 +455,8 @@
         function createFileItem(fileInfo) {
             const fileItem = document.createElement('div');
             fileItem.className = 'file-item';
-            
             const fileName = fileInfo.name || new URL(fileInfo.url).pathname.split('/').pop() || 'Unknown File';
-            const fileExt = filename.split('.').pop().toLowerCase();
+            const fileExt = fileName.split('.').pop().toLowerCase();
             fileItem.innerHTML = `
                 <svg class="file-icon" viewBox="0 0 24 24" fill="currentColor">
                     ${getFileIcon(fileName)}
@@ -472,14 +471,13 @@
                     </div>
                 </div>
             `;
-            
-            // Add click handler to open file
+
             fileItem.addEventListener('click', () => {
                 if (fileInfo.url) {
                     window.open(fileInfo.url, '_blank');
                 }
             });
-            
+
             return fileItem;
         }
 
