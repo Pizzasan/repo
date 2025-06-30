@@ -1,0 +1,3 @@
+https://gist.github.com/Pizzasan/d73af26e9e78530d1a4edee4cc561a28/raw/qol_filesharing.js
+https://gist.github.com/Pizzasan/f6ff50eccc9fac40d97015e9ed9599d5/raw/m_batchext.py
+https://gist.github.com/Pizzasan/2ac0a6337b969b287c039d61cfaa7efb/raw/fyouEAAC.py

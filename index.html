@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Server</title>
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-accent: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --hover: #f1f5f9;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --icon-filter: invert(0);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary: #0f172a;
+                --bg-secondary: #1e293b;
+                --bg-accent: #334155;
+                --text-primary: #f1f5f9;
+                --text-secondary: #cbd5e1;
+                --text-muted: #94a3b8;
+                --border: #475569;
+                --hover: #334155;
+                --accent: #60a5fa;
+                --accent-hover: #3b82f6;
+                --shadow: rgba(0, 0, 0, 0.3);
+                --icon-filter: invert(1);
+            }
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-accent: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --hover: #f1f5f9;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --icon-filter: invert(0);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-accent: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border: #475569;
+            --hover: #334155;
+            --accent: #60a5fa;
+            --accent-hover: #3b82f6;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --icon-filter: invert(1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px var(--shadow);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .server-icon {
+            width: 24px;
+            height: 24px;
+            filter: var(--icon-filter);
+        }
+
+        .theme-toggle {
+            background: var(--bg-accent);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .theme-toggle:hover {
+            background: var(--hover);
+            transform: translateY(-1px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 300px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            filter: var(--icon-filter);
+            opacity: 0.5;
+        }
+
+        .file-list {
+            background: var(--bg-secondary);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-item:hover {
+            background: var(--hover);
+        }
+
+        .file-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 1rem;
+            filter: var(--icon-filter);
+            opacity: 0.7;
+        }
+
+        .file-info {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .file-details {
+            display: flex;
+            gap: 2rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .file-status.success {
+            color: #10b981;
+        }
+
+        .file-status.error {
+            color: #ef4444;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            box-shadow: 0 1px 3px var(--shadow);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .loading-message {
+            text-align: center;
+            padding: 2rem;
+            background: var(--bg-secondary);
+            border-radius: 0.75rem;
+            color: var(--text-secondary);
+            animation: pulse 2s infinite;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 2rem;
+            background: var(--bg-secondary);
+            border-radius: 0.75rem;
+            color: #ef4444;
+            display: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: none;
+            }
+
+            .file-details {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>
+            <svg class="server-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
+            </svg>
+            Misc. Projects / Scripts
+        </h1>
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <span id="theme-icon">🌙</span>
+            <span id="theme-text">Dark</span>
+        </button>
+    </div>
+
+    <div class="container">
+        <div class="toolbar">
+            <div class="search-box">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+                <input type="text" class="search-input" placeholder="Search files..." oninput="filterFiles(this.value)">
+            </div>
+        </div>
+
+        <div class="loading-message" id="loadingMessage">
+            Loading files...
+        </div>
+
+        <div class="error-message" id="errorMessage">
+            <!-- Error content will be populated by JavaScript -->
+        </div>
+
+        <div class="file-list" id="fileList" style="display: none;">
+            <!-- Files will be populated by JavaScript -->
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="fileCount">0</div>
+                <div class="stat-label">Files</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalSize">0 B</div>
+                <div class="stat-label">Size</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="successCount">0</div>
+                <div class="stat-label">Loaded</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="errorCount">0</div>
+                <div class="stat-label">Errors</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTheme = 'auto';
+        let allFiles = [];
+        let stats = {
+            totalFiles: 0,
+            totalSize: 0,
+            successCount: 0,
+            errorCount: 0
+        };
+
+        function initTheme() {
+            // Use in-memory storage instead of localStorage
+            currentTheme = 'auto';
+            applyTheme(currentTheme);
+        }
+
+        function applyTheme(theme) {
+            const body = document.body;
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+
+            if (theme === 'auto') {
+                body.removeAttribute('data-theme');
+                themeIcon.textContent = '🌓';
+                themeText.textContent = 'Auto';
+            } else if (theme === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Light';
+            } else {
+                body.setAttribute('data-theme', 'light');
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark';
+            }
+        }
+
+        function toggleTheme() {
+            const themes = ['auto', 'light', 'dark'];
+            const currentIndex = themes.indexOf(currentTheme);
+            const nextIndex = (currentIndex + 1) % themes.length;
+            currentTheme = themes[nextIndex];
+            applyTheme(currentTheme);
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function getFileIcon(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            const iconMap = {
+                // Documents
+                'pdf': '<path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>',
+                'doc': '<path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>',
+                'docx': '<path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>',
+                'txt': '<path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>',
+                
+                // Spreadsheets
+                'xls': '<path d="M21,9V7H9V9H21M21,11H9V13H21V11M21,15H9V17H21V15M7,7V9H5V7H7M7,11V13H5V11H7M7,15V17H5V15H7Z"/>',
+                'xlsx': '<path d="M21,9V7H9V9H21M21,11H9V13H21V11M21,15H9V17H21V15M7,7V9H5V7H7M7,11V13H5V11H7M7,15V17H5V15H7Z"/>',
+                'csv': '<path d="M21,9V7H9V9H21M21,11H9V13H21V11M21,15H9V17H21V15M7,7V9H5V7H7M7,11V13H5V11H7M7,15V17H5V15H7Z"/>',
+                
+                // Presentations
+                'ppt': '<path d="M21,16V4H3V16H21M21,2A2,2 0 0,1 23,4V16A2,2 0 0,1 21,18H14L12,21L10,18H3A2,2 0 0,1 1,16V4A2,2 0 0,1 3,2H21M5,6H19V8H5V6M5,10H14V12H5V10Z"/>',
+                'pptx': '<path d="M21,16V4H3V16H21M21,2A2,2 0 0,1 23,4V16A2,2 0 0,1 21,18H14L12,21L10,18H3A2,2 0 0,1 1,16V4A2,2 0 0,1 3,2H21M5,6H19V8H5V6M5,10H14V12H5V10Z"/>',
+                
+                // Images
+                'jpg': '<path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"/>',
+                'jpeg': '<path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"/>',
+                'png': '<path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"/>',
+                'gif': '<path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"/>',
+                
+                // Archives
+                'zip': '<path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>',
+                'rar': '<path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>',
+                '7z': '<path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>',
+                
+                // Code
+                'js': '<path d="M3,3H21V21H3V3M7.73,18.04C8.13,18.89 8.92,19.59 10.27,19.59C11.77,19.59 12.8,18.79 12.8,17.04V11.26H11.1V17C11.1,17.86 10.75,18.08 10.2,18.08C9.62,18.08 9.38,17.68 9.11,17.21L7.73,18.04M13.71,17.86C14.21,18.84 15.22,19.59 16.8,19.59C18.4,19.59 19.6,18.76 19.6,17.23C19.6,15.82 18.79,15.19 17.35,14.57L16.93,14.39C16.2,14.08 15.89,13.87 15.89,13.37C15.89,12.96 16.2,12.64 16.7,12.64C17.18,12.64 17.5,12.85 17.79,13.37L19.1,12.5C18.55,11.54 17.77,11.17 16.7,11.17C15.19,11.17 14.22,12.13 14.22,13.4C14.22,14.78 15.03,15.43 16.25,15.95L16.67,16.13C17.45,16.47 17.91,16.68 17.91,17.26C17.91,17.74 17.46,18.09 16.76,18.09C15.93,18.09 15.45,17.66 15.09,17.06L13.71,17.86Z"/>',
+                'html': '<path d="M12,17.56L16.07,16.43L16.62,10.33H9.38L9.2,8.3H16.8L17,6.31H7L7.56,12.32H14.45L14.22,14.9L12,15.5L9.78,14.9L9.64,13.24H7.64L7.93,16.43L12,17.56M4.07,3H19.93L18.5,19.2L12,21L5.5,19.2L4.07,3Z"/>',
+                'css': '<path d="M5,3L4.35,6.34H17.94L17.5,8.5H3.92L3.26,11.83H16.85L16.09,15.64L10.61,17.45L5.86,15.64L6.19,14H2.85L2.06,18L9.91,21L18.96,18L20.16,11.97L20.4,10.76L21.94,3H5Z"/>',
+                
+                // Default
+                'default': '<path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>'
+            };
+            return iconMap[ext] || iconMap.default;
+        }
+
+        function createFileItem(fileInfo) {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            
+            const fileName = fileInfo.name || new URL(fileInfo.url).pathname.split('/').pop() || 'Unknown File';
+            const fileSize = fileInfo.size ? formatBytes(fileInfo.size) : 'Unknown';
+            const lastModified = fileInfo.lastModified || 'Unknown';
+            
+            fileItem.innerHTML = `
+                <svg class="file-icon" viewBox="0 0 24 24" fill="currentColor">
+                    ${getFileIcon(fileName)}
+                </svg>
+                <div class="file-info">
+                    <div class="file-name" title="${fileName}">${fileName}</div>
+                    <div class="file-details">
+                        <span>${fileSize}</span>
+                        <span>Modified: ${lastModified}</span>
+                        <span class="file-status ${fileInfo.error ? 'error' : 'success'}" title="${fileInfo.error || 'Loaded successfully'}">
+                            ${fileInfo.error ? '❌' : '✅'}
+                        </span>
+                    </div>
+                </div>
+            `;
+            
+            // Add click handler to open file
+            fileItem.addEventListener('click', () => {
+                if (fileInfo.url) {
+                    window.open(fileInfo.url, '_blank');
+                }
+            });
+            
+            return fileItem;
+        }
+
+        async function fetchFileInfo(url) {
+            try {
+                const response = await fetch(url, { method: 'HEAD' });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const contentLength = response.headers.get('content-length');
+                const lastModified = response.headers.get('last-modified');
+                const contentType = response.headers.get('content-type');
+                
+                return {
+                    url: url,
+                    name: new URL(url).pathname.split('/').pop(),
+                    size: contentLength ? parseInt(contentLength) : null,
+                    lastModified: lastModified ? new Date(lastModified).toLocaleDateString() : null,
+                    contentType: contentType,
+                    error: null
+                };
+            } catch (error) {
+                console.error(`Error fetching ${url}:`, error);
+                return {
+                    url: url,
+                    name: new URL(url).pathname.split('/').pop(),
+                    size: null,
+                    lastModified: null,
+                    contentType: null,
+                    error: error.message
+                };
+            }
+        }
+
+        async function loadFiles() {
+            const loadingMessage = document.getElementById('loadingMessage');
+            const fileList = document.getElementById('fileList');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            try {
+                // Fetch the files.txt file
+                const response = await fetch('files.txt');
+                if (!response.ok) {
+                    throw new Error(`Failed to load files.txt: ${response.status} ${response.statusText}`);
+                }
+                
+                const text = await response.text();
+                const urls = text.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line && !line.startsWith('#')); // Remove empty lines and comments
+                
+                if (urls.length === 0) {
+                    throw new Error('No URLs found in files.txt');
+                }
+                
+                stats.totalFiles = urls.length;
+                updateStats();
+                
+                loadingMessage.textContent = `Loading ${urls.length} files...`;
+                
+                // Fetch file info for each URL
+                const fileInfoPromises = urls.map(async (url, index) => {
+                    const fileInfo = await fetchFileInfo(url);
+                    
+                    // Update progress
+                    loadingMessage.textContent = `Loading files... (${index + 1}/${urls.length})`;
+                    
+                    // Update stats
+                    if (fileInfo.error) {
+                        stats.errorCount++;
+                    } else {
+                        stats.successCount++;
+                        if (fileInfo.size) {
+                            stats.totalSize += fileInfo.size;
+                        }
+                    }
+                    updateStats();
+                    
+                    return fileInfo;
+                });
+                
+                // Wait for all file info to be fetched
+                allFiles = await Promise.all(fileInfoPromises);
+                
+                // Hide loading message and show file list
+                loadingMessage.style.display = 'none';
+                fileList.style.display = 'block';
+                
+                // Render files
+                renderFiles(allFiles);
+                
+                // Final stats update
+                updateStats();
+                
+            } catch (error) {
+                console.error('Error loading files:', error);
+                loadingMessage.style.display = 'none';
+                errorMessage.style.display = 'block';
+                errorMessage.innerHTML = `
+                    <h3>Error Loading Files</h3>
+                    <p>${error.message}</p>
+                    <p style="margin-top: 1rem; font-size: 0.875rem; opacity: 0.8;">
+                        Make sure the <code>files.txt</code> file exists and contains valid URLs (one per line).
+                    </p>
+                `;
+            }
+        }
+
+        function renderFiles(files) {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            
+            files.forEach(fileInfo => {
+                const fileItem = createFileItem(fileInfo);
+                fileList.appendChild(fileItem);
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('fileCount').textContent = stats.totalFiles;
+            document.getElementById('totalSize').textContent = formatBytes(stats.totalSize);
+            document.getElementById('successCount').textContent = stats.successCount;
+            document.getElementById('errorCount').textContent = stats.errorCount;
+        }
+
+        function filterFiles(query) {
+            const searchTerm = query.toLowerCase();
+            const filteredFiles = allFiles.filter(file => {
+                const fileName = file.name || '';
+                return fileName.toLowerCase().includes(searchTerm);
+            });
+            renderFiles(filteredFiles);
+        }
+
+        // Initialize theme and load files on page load
+        initTheme();
+        loadFiles();
+    </script>
+</body>
+</html>
