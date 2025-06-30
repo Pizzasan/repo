@@ -316,10 +316,11 @@
             </svg>
             Misc. Projects / Scripts
         </h1>
-        <button class="theme-toggle" onclick="toggleTheme()">
-            <span id="theme-icon">🌙</span>
-            <span id="theme-text">Dark</span>
+        <button onclick="toggleTheme()" class="theme-toggle">
+            <span id="theme-icon">🌓</span>
+            <span id="theme-text">Auto</span>
         </button>
+        
     </div>
 
     <div class="container">
@@ -383,18 +384,19 @@
 
             if (theme === 'auto') {
                 body.removeAttribute('data-theme');
-                themeIcon.textContent = '🌓';
-                themeText.textContent = 'Auto';
+                if (themeIcon) themeIcon.textContent = '🌓';
+                if (themeText) themeText.textContent = 'Auto';
             } else if (theme === 'dark') {
                 body.setAttribute('data-theme', 'dark');
-                themeIcon.textContent = '☀️';
-                themeText.textContent = 'Light';
+                if (themeIcon) themeIcon.textContent = '☀️';
+                if (themeText) themeText.textContent = 'Light';
             } else {
                 body.setAttribute('data-theme', 'light');
-                themeIcon.textContent = '🌙';
-                themeText.textContent = 'Dark';
+                if (themeIcon) themeIcon.textContent = '🌙';
+                if (themeText) themeText.textContent = 'Dark';
             }
         }
+
 
         function toggleTheme() {
             const themes = ['auto', 'light', 'dark'];
@@ -613,7 +615,6 @@
             renderFiles(filteredFiles);
         }
 
-        // Initialize theme and load files on page load
         initTheme();
         loadFiles();
     </script>
