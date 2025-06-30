@@ -12,6 +12,7 @@ if (headerImage) {
         }, 2000);
         if (clickCount === 7) {
             triggered = true;
+            print("OK")
             clickCount = 0;
         }
     });
