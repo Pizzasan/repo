@@ -529,7 +529,7 @@
             
             try {
                 // Fetch the files.txt file
-                const response = await fetch('/ressources/files.txt');
+                const response = await fetch('/repo/ressources/files.txt');
                 if (!response.ok) {
                     throw new Error(`Failed to load files.txt: ${response.status} ${response.statusText}`);
                 }
