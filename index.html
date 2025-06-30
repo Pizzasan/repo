@@ -350,10 +350,6 @@
                 <div class="stat-label">Files</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="totalSize">0 B</div>
-                <div class="stat-label">Size</div>
-            </div>
-            <div class="stat-card">
                 <div class="stat-number" id="successCount">0</div>
                 <div class="stat-label">Loaded</div>
             </div>
@@ -461,9 +457,7 @@
             fileItem.className = 'file-item';
             
             const fileName = fileInfo.name || new URL(fileInfo.url).pathname.split('/').pop() || 'Unknown File';
-            const fileSize = fileInfo.size ? formatBytes(fileInfo.size) : 'Unknown';
-            const lastModified = fileInfo.lastModified || 'Unknown';
-            
+            const fileExt = filename.split('.').pop().toLowerCase();
             fileItem.innerHTML = `
                 <svg class="file-icon" viewBox="0 0 24 24" fill="currentColor">
                     ${getFileIcon(fileName)}
@@ -471,8 +465,7 @@
                 <div class="file-info">
                     <div class="file-name" title="${fileName}">${fileName}</div>
                     <div class="file-details">
-                        <span>${fileSize}</span>
-                        <span>Modified: ${lastModified}</span>
+                        <span>${fileExt}</span>
                         <span class="file-status ${fileInfo.error ? 'error' : 'success'}" title="${fileInfo.error || 'Loaded successfully'}">
                             ${fileInfo.error ? '❌' : '✅'}
                         </span>
